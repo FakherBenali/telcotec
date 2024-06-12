@@ -1,0 +1,60 @@
+<div class="row">
+    <div class="col-6 mx-auto">
+        <button data-bs-toggle="modal" data-bs-target="#exampleModal" class="mt-5 btn btn-success">Create task</button>
+
+        <table class="table mt-5">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Description</th>
+                <th>Number</th>
+                <th>Price</th>
+                <th>Photo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let task of tasks">
+                <td>{{ task.name}}</td>
+                <td>{{ task.location}}</td>
+                <td>{{ task.description}}</td>
+                <td>{{ task.number }}</td>
+                <td>{{ task.price }}</td>
+                <td><img src="{{ replaceText(task.photo) }}" alt="Task Photo" width="100"></td>
+                <td>{{ task.price }}</td>
+                <td>    <button (click)="edit( task._id )" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning">Edit</button></td>
+                <td>    <button (click)="delete( task._id )" data-bs-toggle="modal" class="btn btn-danger">Delete</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Create new task</h5>
+                  <button type="button" class="btn-close" (click)="updateStep = false" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label>Name</label>
+                    <input [(ngModel)]="task.name" type="text" class="form-control m-1" placeholder="Name">
+                    <label>Location</label>
+                    <input [(ngModel)]="task.location" type="text" class="form-control m-1" placeholder="Location">
+                    <label>Description</label>
+                    <input [(ngModel)]="task.description" type="text" class="form-control m-1" placeholder="Description">
+                    <label>Number</label>
+                    <input [(ngModel)]="task.number" type="text" class="form-control m-1" placeholder="Number">
+                    <label>Price</label>
+                    <input [(ngModel)]="task.price" type="text" class="form-control m-1" placeholder="Price">
+                    <label>Photo</label>
+                    <input type="file" (change)="selectPhoto($event)" class="form-control m-1" placeholder="Price" accept="image/*">
+                </div>
+                <div class="modal-footer">
+                  <button type="button" *ngIf="!updateStep" class="btn btn-secondary" data-bs-dismiss="modal" (click)="save()">Save</button>
+                  <button type="button" *ngIf="updateStep" class="btn btn-secondary" data-bs-dismiss="modal" (click)="update()">Update</button>
+                  <!-- Additional buttons or actions can be added here -->
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>

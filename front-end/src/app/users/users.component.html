@@ -1,0 +1,80 @@
+<app-navbar>
+</app-navbar>
+<div class="row">
+    <div class="col-6 mx-auto">
+      <form class="row mt-5">
+        <div class="mt-5 col-3">
+          <input type="text" class="form-control" placeholder="company name"  (keyup)="searchByCompanyName( $event )">
+        </div>
+      </form>
+        <table  class="table mt-5">
+            <thead>
+              <tr>
+                <th>Company Name</th>
+                <th>Company address</th>
+                <th>Vat number</th>
+                <th>Primary focus of your business</th>
+                <th>applicant first Name</th>
+                <th>Applicant last Name</th>
+                <th>email</th>
+                <th>title</th>
+                <th>Applicant number</th>
+                <th>validation date</th>
+                <th>expiration date</th>
+                
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of users">
+                <td>{{ user.companyname}}</td>
+                <td>{{ user.companyaddress }}</td>
+                <td>{{ user.vatnumber }}</td>
+                <td>{{ user.about }}</td>
+                <td>{{ user.firstname }}</td>
+                <td>{{ user.lastname }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.title }}</td>
+                <td>{{ user.applicantnumber }}</td>
+                <td>{{ formatDate(user.activate_date) }}</td>
+                <td>{{ formatDate(user.banned_date) }}</td>
+                <td class="row">
+                  <div *ngIf="user.banned_date < date || user.activate_date < date;else activeBlock">
+                        <button  (click)="suspend( user._id )" class="btn btn-danger">Suspend</button>
+                        
+                        <button (click)="banned( user._id )" class="btn btn-warning">Ban</button>
+                      </div>
+                    <ng-template  #activeBlock >
+                    <button (click)="setSelectedUserId( user._id )" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-success">Active</button>
+                  </ng-template>
+                      
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form>
+                    <div class="mb-3">
+                      <label for="exampleDate" class="form-label">Select Date</label>
+                      <input type="date" class="form-control" id="exampleDate" (change)="setActiveDate( $event )">
+                    </div>
+                    <!-- Other form fields can be added here -->
+                    <button type="submit" (click)="activate()" class="btn btn-primary">Activate</button>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <!-- Additional buttons or actions can be added here -->
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
+

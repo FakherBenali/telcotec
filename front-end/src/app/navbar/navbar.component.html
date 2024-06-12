@@ -1,0 +1,23 @@
+<nav class="navbar">
+    <ul class="nav nav-pills " id="menu">
+
+        <li class="navbar-item"><a href="/home" >Home</a></li>
+
+        <li  class="navbar-item"  *ngIf="permissions.includes('66693007e9b2b5672be9fcbf')" ><a href="/task" routerLinkActive="active">Tasks</a></li>
+
+        <li class="navbar-item"><a href="/accounts"  *ngIf="isadmin">Manage Account</a></li>
+        <li class="navbar-item" *ngIf="permissions.includes('66693082e9b2b5672be9fcc3')"><a href="/finance" routerLinkActive="active">Finance</a></li>
+        <li class="navbar-item"  *ngIf="permissions.includes('66693050e9b2b5672be9fcc1')" >
+            <a href="#submenu1" href="/users"  data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                <i class="fs-4 bi-speedometer2"></i> <span class="ms-1 d-none d-sm-inline">Users</span> </a>
+           <!--  <ul class="collapse show nav flex-column ms-1" id="submenu1" data-bs-parent="#menu">
+                <li class="w-100">
+                    <a  routerLink="/users"  routerLinkActive="active" href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Show Users</span> </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link px-0"> Create user </a>
+                </li>
+            </ul> -->
+        </li>
+    </ul>
+</nav>
