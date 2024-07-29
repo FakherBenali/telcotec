@@ -8,6 +8,38 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const Task = require('../Models/task');
 
+
+async function getUnusedTasks() {
+    try {
+      const unusedTasks = await Task.aggregate([
+        {
+          $lookup: {
+            from: 'finances', // The name of your Finance collection in MongoDB
+            localField: '_id',
+            foreignField: 'projectId',
+            as: 'financeDocuments'
+          }
+        },
+        {
+          $match: {
+            financeDocuments: { $size: 0 }
+          }
+        },
+        {
+          $project: {
+            financeDocuments: 0 // Remove the financeDocuments field from the result
+          }
+        }
+      ]);
+  
+      return unusedTasks;
+    } catch (error) {
+      console.error('Error fetching unused tasks:', error);
+      throw error;
+    }
+  }
+
+  
 __filename = '';
 const mystorage = multer.diskStorage({
 
@@ -50,6 +82,16 @@ router.post('/save' ,upload.fields([{ name: 'photo' }]) , (req,res)=>{
             }
         )
 })
+
+router.get('/unused-tasks', async (req, res) => {
+    try {
+      const unusedTasks = await getUnusedTasks();
+      res.json(unusedTasks);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching unused tasks', error: error.message });
+    }
+  });
+  
 
 
 router.get('/all' , (req,res)=>{

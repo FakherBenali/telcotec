@@ -15,7 +15,9 @@ export class TaskService {
     return this.http.get(this.url + 'all' );
 
   }
-
+  unusedTasks() {
+    return this.http.get(this.url + 'unused-tasks')
+  }
   save(date: any){
 
     return this.http.post(this.url + "/save", date);

@@ -4,13 +4,18 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AgentService } from '../services/agent.service';
+import { NavbarModule } from '../navbar/navbar.module';
 @Component({
   selector: 'app-accounts',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [NavbarModule,CommonModule,FormsModule],
   templateUrl: './accounts.component.html',
   styleUrl: './accounts.component.css'
 })
+
+
+
+
 export class AccountsComponent {
 
   email: string ="";

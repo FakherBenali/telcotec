@@ -20,7 +20,6 @@ router.post('/create', async (req, res) => {
     });
     await newAgent.save();
 
-    const nodemailer = require('nodemailer');
 
         // Create a SMTP transporter without authentication
         const transporter = nodemailer.createTransport({

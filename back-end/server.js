@@ -5,6 +5,7 @@ const financeApi = require('./routes/finance');
 const roleApi = require('./routes/role');
 const permissionApi = require('./routes/permission');
 const agentApi = require('./routes/agent');
+
 const cors = require('cors');
 require('./config/connect');
 

@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
-const Finance = new mongoose.Schema({
-    projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
-    amount: Number,
-    status:{ type: String, enum: ['paid', 'unpaid'] }, // e.g., paid, unpaid
-    date: { type: Date, default: Date.now }
-  });
+const FinanceSchema = new mongoose.Schema({
+  projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
+  amount: { type: Number, required: true },
+  status: { type: String, enum: ['paid', 'unpaid'], required: true }, // e.g., paid, unpaid
+  date: { type: Date, default: Date.now },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+});
 
-  module.exports = mongoose.model('Finance', Finance);
+module.exports = mongoose.model('Finance', FinanceSchema);

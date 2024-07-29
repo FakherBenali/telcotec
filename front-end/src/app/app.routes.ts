@@ -6,6 +6,7 @@ import { LoginComponent } from './login/login.component';
 import { UsersComponent } from './users/users.component';
 import { TaskComponent } from './task/task.component';
 import { AccountsComponent } from './accounts/accounts.component';
+import { FinanceComponent } from './finance/finance.component';
 
 export const routes: Routes = [
 
@@ -16,6 +17,7 @@ export const routes: Routes = [
     { path: 'users' , component: UsersComponent},
     {path: 'task', component: TaskComponent},
     {path: 'accounts', component: AccountsComponent},
+    {path: 'finance', component: FinanceComponent},
     { path: '**' , component: NotfoundComponent},
     
 ];

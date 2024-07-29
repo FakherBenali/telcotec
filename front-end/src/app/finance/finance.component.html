@@ -1,0 +1,147 @@
+
+
+<mat-tab-group>
+    <mat-tab label="Summary">
+      <mat-card>
+        <mat-card-title>Financial Summary<br>
+    <button data-bs-toggle="modal" data-bs-target="#exampleModal" class="mt-5 btn btn-success">Create invoice</button>
+
+        </mat-card-title>
+        <mat-card-content>
+            <div>
+                <label for="userFilter">Filter by User:</label>
+                <select id="userFilter" (change)="onUserSelect($event)">
+                  <option value="">All Users</option>
+                  <option *ngFor="let user of users" [value]="user._id">
+                    {{user.firstname}} {{user.lastname}}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label for="statusFilter">Filter by Status:</label>
+                <select id="statusFilter" (change)="onStatusSelect($event)">
+                  <option value="">All</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Unpaid">Unpaid</option>
+                </select>
+              </div>
+
+        <table class="table mt-5">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Project Name</th>
+                <th>User Name</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let element of filteredFinances">
+                <td>{{ element.financeId }}</td>
+                <td>{{ element.projectName }}</td>
+                <td>{{ element.userName }}</td>
+                <td>{{element.totalAmount | currency}}</td>
+                <td>{{element.totalPaid > 0 ? 'Paid' : 'Unpaid'}}</td>
+                <td *ngIf="element.totalPaid == 0">              <button mat-button color="primary" (click)="payInvoice(element.financeId)">Pay</button>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2"><strong>Summary</strong></td>
+                <td></td>
+                <td><strong>total: {{summary.totalAmount | currency}}</strong></td>
+                <td>
+                  Paid: {{summary.totalPaid | currency}}<br>
+                  Unpaid: {{summary.totalUnpaid | currency}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+  
+    <!-- <mat-tab label="Unpaid Invoices">
+      <mat-card>
+        <mat-card-title>Unpaid Invoices</mat-card-title>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngFor="let invoice of unpaidInvoices">
+              {{invoice.projectName}} - {{invoice.user?.firstName}} {{invoice.user?.lastName}} - {{invoice.amount | currency}}
+              <button mat-button color="primary" (click)="payInvoice(invoice._id)">Pay</button>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+  
+    <mat-tab label="Paid Invoices">
+      <mat-card>
+        <mat-card-title>Paid Invoices</mat-card-title>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngFor="let invoice of paidInvoices">
+              {{invoice.projectName}} -  {{invoice.user?.firstName}} {{invoice.user?.lastName}}  - {{invoice.amount | currency}}
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab> -->
+  </mat-tab-group>
+
+
+ 
+<div class="row">
+    <div class="col-6 mx-auto">
+
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Create new invoice</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="financeForm" (ngSubmit)="onSubmit()">
+                        <div>
+                            <label for="userId">User</label>
+                            <select id="userId" formControlName="userId" required>
+                              <option value="">Select a user</option>
+                              <option *ngFor="let user of users" [value]="user._id">
+                                {{user.firstname}} {{user.lastname}}
+                              </option>
+                            </select>
+                          </div>
+                        
+                          <div>
+                            <label for="projectId">Project</label>
+                            <select id="projectId" formControlName="projectId" required>
+                              <option value="">Select a project</option>
+                              <option *ngFor="let project of projects" [value]="project._id">
+                                {{project.name}}
+                              </option>
+                            </select>
+                          </div>
+              
+
+                          <label>Amount</label>
+                          <input matInput type="number" formControlName="amount" required>
+              
+                          <label>Status</label>
+                          <select formControlName="status" required>
+                            <option value="unpaid">Unpaid</option>
+                            <option value="paid">Paid</option>
+                          </select>
+                <div class="modal-footer">
+
+                          <button mat-raised-button color="primary" type="submit" [disabled]="!financeForm.valid"  data-bs-dismiss="modal" aria-label="Close">Create Invoice</button>
+                        </div>
+                        
+                      </form>
+                  <!-- Additional buttons or actions can be added here -->
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
