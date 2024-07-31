@@ -1,10 +1,26 @@
-<app-cover>
-</app-cover>
-<div>
-<div class="container">
-  <app-chart></app-chart>
+<app-cover></app-cover>
+<div class="container mt-4" style="padding-left: 10%; width: auto;">
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title">Revenues</h5>
+        </div>
+        <div class="card-body">
+          <app-revenues></app-revenues>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title">Chart</h5>
+        </div>
+        <app-chart></app-chart>
+        <div class="card-body">
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<app-revenues></app-revenues>
-</div>
-<app-navbar>
-</app-navbar>
+<app-navbar></app-navbar>
