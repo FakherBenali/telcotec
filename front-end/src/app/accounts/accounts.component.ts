@@ -26,6 +26,7 @@ export class AccountsComponent {
     {"id" : "66693050e9b2b5672be9fcc1" , "name": "USERS"} , 
     {"id" : "66693082e9b2b5672be9fcc3" , "name": "FINANCE"} , 
     ];
+isadmin: any;
 
   constructor(private agentService: AgentService) {}
 

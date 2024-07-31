@@ -1,0 +1,5 @@
+<div>
+    <canvasjs-chart [options]="chartOptions" (chartInstance)="getChartInstance($event)"></canvasjs-chart>
+    <button *ngIf="isButtonVisible" (click)="handleClick($event)">Reset</button>
+  </div>
+  

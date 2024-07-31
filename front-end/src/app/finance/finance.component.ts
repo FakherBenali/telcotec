@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { UserService } from '../services/user.service';
 import { TaskService } from '../services/task.service';
+import { NavbarModule } from '../navbar/navbar.module';
 
 @Component({
   selector: 'app-finance',
@@ -27,7 +28,8 @@ import { TaskService } from '../services/task.service';
     MatListModule,
     MatButtonModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    NavbarModule
   ]
 })
 export class FinanceComponent implements OnInit {
