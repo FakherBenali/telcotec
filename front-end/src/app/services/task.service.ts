@@ -1,39 +1,33 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
+import { Observable } from 'rxjs';
+import { TaskComponent } from '../task/task.component'; 
 @Injectable({
   providedIn: 'root'
 })
 export class TaskService {
 
-  constructor( private http: HttpClient ) { }
+  private url = 'http://127.0.0.1:3000/task/';
 
-  private url = 'http://127.0.0.1:3000/task/'
+  constructor(private http: HttpClient) { }
 
-  getAll(){
-
-    return this.http.get(this.url + 'all' );
-
-  }
-  unusedTasks() {
-    return this.http.get(this.url + 'unused-tasks')
-  }
-  save(date: any){
-
-    return this.http.post(this.url + "/save", date);
-
+  getAll(): Observable<TaskComponent[]> {
+    return this.http.get<TaskComponent[]>(this.url + 'all');
   }
 
-  
-  delete(id: any){
+  unusedTasks(): Observable<TaskComponent[]> {
+    return this.http.get<TaskComponent[]>(this.url + 'unused-tasks');
+  }
 
+  save(date: FormData): Observable<any> {
+    return this.http.post(this.url + 'save', date);
+  }
+
+  delete(id: string): Observable<any> {
     return this.http.delete(this.url + id);
-
   }
 
-  update(id: any,date:any){
-
-    return this.http.put(this.url + "/update/"+id , date);
-
+  update(id: string, date: FormData): Observable<any> {
+    return this.http.put(this.url + 'update/' + id, date);
   }
 }

@@ -10,14 +10,24 @@ const TaskSchema = new mongoose.Schema({
     description: {
         type: String
     },
-    number: {
+    budget: {
         type: Number
     },
-    price: {
+    depenses: {
         type: Number
     },
     photo: {
         type: String
+    },
+    type: {
+        type: String
+    },
+    target: {
+        type: [String]
+    },
+    date: {
+        type: Date,
+        default: Date.now
     }
 });
 

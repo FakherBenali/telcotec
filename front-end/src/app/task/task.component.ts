@@ -4,126 +4,122 @@ import { FormsModule } from '@angular/forms';
 import { TaskService } from '../services/task.service';
 import { Router } from '@angular/router';
 import { NavbarModule } from '../navbar/navbar.module';
+
 @Component({
   selector: 'app-task',
   standalone: true,
-  imports: [NavbarModule, CommonModule,FormsModule ],
+  imports: [NavbarModule, CommonModule, FormsModule],
   templateUrl: './task.component.html',
-  styleUrl: './task.component.css'
+  styleUrls: ['./task.component.css']  // Corrected from styleUrl to styleUrls
 })
 export class TaskComponent {
-
-  // date = new Date().getTime();
-  tasks: any = []
+  date = new Date().getTime();
+  tasks: any = [];
 
   task = {
-
     name: '',
     location: '',
     description: '',
-    number: '',
-    price: '',
-   
-  }
+    budget: '',
+    depenses: '',
+    type: '',
+    target: {  // Initialize target with default values
+      All: false,
+      Men: false,
+      Women: false,
+      Under: false,
+      Over: false
+    },
+    date: ''
+  };
+
   photo: any;
-  updateStep: boolean = false
+  updateStep: boolean = false;
   idUpdate: any;
-  
-  constructor( private TaskService: TaskService , private router: Router){  }
+
+  constructor(private TaskService: TaskService, private router: Router) {}
 
   ngOnInit(): void {
-
     this.fetchTask();
-
   }
 
   fetchTask(): void {
-    this.TaskService.getAll()
-      .subscribe(tasks => {
-        this.tasks = tasks;
-        
-      });
+    this.TaskService.getAll().subscribe(tasks => {
+      console.log('Fetched tasks:', tasks);
+      this.tasks = tasks;
+    });
   }
 
-  selectPhoto(e:any){
+  selectPhoto(e: any) {
     this.photo = e.target.files[0];
   }
-  
-  replaceText(e: string){
+
+  replaceText(e: string) {
     return "http://localhost:3000/" + e.replace('uploads', '');
   }
 
   delete(id: any) {
-    this.TaskService.delete(id).subscribe(
-      () => {
-        this.fetchTask()
-
-      }
-    )
+    this.TaskService.delete(id).subscribe(() => {
+      this.fetchTask();
+    });
   }
 
   edit(id: any) {
     this.photo = null;
-    let tempTask = this.tasks.filter((t:any) => t._id == id)[0]
-    this.task.name = tempTask.name;
-    this.task.location = tempTask.location;
-    this.task.description= tempTask.description;
-    this.task.number= tempTask.number;
-    this.task.price= tempTask.price;
-    console.log(tempTask)
+    let tempTask = this.tasks.find((t: any) => t._id === id);
+    this.task = { ...tempTask, target: { ...tempTask.target } }; // Ensure target is copied correctly
+    this.task.date = tempTask.date;
+    console.log(tempTask);
     this.updateStep = true;
     this.idUpdate = id;
   }
-  save(){
-    let fd = new FormData()
-    fd.append('name',this.task.name);
-    fd.append('location',this.task.location);
-    fd.append('description',this.task.description);
-    fd.append('number',this.task.number);
-    fd.append('price',this.task.price);
-    
 
-    fd.append('photo',this.photo);
+  save() {
+    let fd = new FormData();
+    fd.append('name', this.task.name);
+    fd.append('type', this.task.type);
+    fd.append('location', this.task.location);
+    fd.append('description', this.task.description);
+    fd.append('budget', this.task.budget);
+    fd.append('depenses', this.task.depenses);
+    fd.append('target', JSON.stringify(this.task.target));
 
-    console.log(fd);
-    
+    if (this.task.date) {
+      let formattedDate = new Date(this.task.date).toISOString();
+      fd.append('date', formattedDate);
+    }
 
-    this.TaskService.save(fd)
-      .subscribe(
-        res=>{
-          // this.router.navigate(['/login']);
-          console.log("ok");
-          this.fetchTask();
+    if (this.photo) {
+      fd.append('photo', this.photo);
+    }
 
-        }
-      )
+    this.TaskService.save(fd).subscribe(res => {
+      console.log("Task saved successfully");
+      this.fetchTask();
+    });
   }
 
+  update() {
+    let fd = new FormData();
+    fd.append('name', this.task.name);
+    fd.append('type', this.task.type);
+    fd.append('location', this.task.location);
+    fd.append('description', this.task.description);
+    fd.append('budget', this.task.budget);
+    fd.append('depenses', this.task.depenses);
+    fd.append('target', JSON.stringify(this.task.target));
+    if (this.task.date) {
+      let formattedDate = new Date(this.task.date).toISOString();
+      fd.append('date', formattedDate);
+    }
 
-  update(){
+    if (this.photo) {
+      fd.append('photo', this.photo);
+    }
 
-    let fd = new FormData()
-    fd.append('name',this.task.name);
-    fd.append('location',this.task.location);
-    fd.append('description',this.task.description);
-    fd.append('number',this.task.number);
-    fd.append('price',this.task.price);
-    
-
-    fd.append('photo',this.photo);
-
-    console.log(fd);
-    
-    this.TaskService.update(this.idUpdate, fd)
-      .subscribe(
-        res=>{
-          // this.router.navigate(['/login']);
-          console.log("ok");
-          this.fetchTask();
-
-        }
-      )
-
+    this.TaskService.update(this.idUpdate, fd).subscribe(res => {
+      console.log("Task updated successfully");
+      this.fetchTask();
+    });
   }
-
 }
