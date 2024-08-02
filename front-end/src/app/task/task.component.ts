@@ -4,15 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { TaskService } from '../services/task.service';
 import { Router } from '@angular/router';
 import { NavbarModule } from '../navbar/navbar.module';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-task',
   standalone: true,
-  imports: [NavbarModule, CommonModule, FormsModule],
+  imports: [NavbarModule, CommonModule, FormsModule, MatDatepickerModule, MatNativeDateModule, MatInputModule],
   templateUrl: './task.component.html',
-  styleUrls: ['./task.component.css']  // Corrected from styleUrl to styleUrls
+  styleUrls: ['./task.component.css']
 })
 export class TaskComponent {
+
   date = new Date().getTime();
   tasks: any = [];
 
@@ -23,21 +27,21 @@ export class TaskComponent {
     budget: '',
     depenses: '',
     type: '',
-    target: {  // Initialize target with default values
+    target: {
       All: false,
       Men: false,
       Women: false,
       Under: false,
       Over: false
     },
-    date: ''
+    startDate: null as Date | null,
+    endDate: null as Date | null
   };
-
   photo: any;
   updateStep: boolean = false;
   idUpdate: any;
 
-  constructor(private TaskService: TaskService, private router: Router) {}
+  constructor(private TaskService: TaskService, private router: Router) { }
 
   ngOnInit(): void {
     this.fetchTask();
@@ -60,15 +64,22 @@ export class TaskComponent {
 
   delete(id: any) {
     this.TaskService.delete(id).subscribe(() => {
-      this.fetchTask();
+      this.fetchTask()
     });
   }
 
   edit(id: any) {
     this.photo = null;
-    let tempTask = this.tasks.find((t: any) => t._id === id);
-    this.task = { ...tempTask, target: { ...tempTask.target } }; // Ensure target is copied correctly
-    this.task.date = tempTask.date;
+    let tempTask = this.tasks.filter((t: any) => t._id == id)[0];
+    this.task.name = tempTask.name;
+    this.task.location = tempTask.location;
+    this.task.description = tempTask.description;
+    this.task.budget = tempTask.budget;
+    this.task.depenses = tempTask.depenses;
+    this.task.type = tempTask.type;
+    this.task = { ...tempTask, target: { ...tempTask.target } };
+    this.task.startDate = new Date(tempTask.startDate);
+    this.task.endDate = new Date(tempTask.endDate);
     console.log(tempTask);
     this.updateStep = true;
     this.idUpdate = id;
@@ -84,9 +95,11 @@ export class TaskComponent {
     fd.append('depenses', this.task.depenses);
     fd.append('target', JSON.stringify(this.task.target));
 
-    if (this.task.date) {
-      let formattedDate = new Date(this.task.date).toISOString();
-      fd.append('date', formattedDate);
+    if (this.task.startDate) {
+      fd.append('startDate', this.task.startDate.toISOString());
+    }
+    if (this.task.endDate) {
+      fd.append('endDate', this.task.endDate.toISOString());
     }
 
     if (this.photo) {
@@ -108,9 +121,12 @@ export class TaskComponent {
     fd.append('budget', this.task.budget);
     fd.append('depenses', this.task.depenses);
     fd.append('target', JSON.stringify(this.task.target));
-    if (this.task.date) {
-      let formattedDate = new Date(this.task.date).toISOString();
-      fd.append('date', formattedDate);
+
+    if (this.task.startDate) {
+      fd.append('startDate', this.task.startDate.toISOString());
+    }
+    if (this.task.endDate) {
+      fd.append('endDate', this.task.endDate.toISOString());
     }
 
     if (this.photo) {
@@ -121,5 +137,12 @@ export class TaskComponent {
       console.log("Task updated successfully");
       this.fetchTask();
     });
+  }
+
+  calculateTaskDuration(startDate: Date, endDate: Date): number {
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
+    const diff = end - start;
+    return diff / (1000 * 60 * 60 * 24); // Convert milliseconds to days
   }
 }

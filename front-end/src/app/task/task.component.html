@@ -12,8 +12,9 @@
           <th>Location</th>
           <th>Budget</th>
           <th>Dépenses</th>
-          <th class="Target-column" *ngIf="task.target.Men">Target</th>
+          <th class="Target-column">Target</th>
           <th class="date-column">Date</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -67,6 +68,31 @@
             <input [(ngModel)]="task.budget" type="text" class="form-control m-1" placeholder="Budget">
             <label>Dépenses</label>
             <input [(ngModel)]="task.depenses" type="text" class="form-control m-1" placeholder="Dépenses">
+            
+            <!-- Date Picker -->
+             <mat-form-field>
+              <mat-label>Start Date</mat-label>
+              <input matInput [(ngModel)]="task.startDate" [matDatepicker]="startPicker">
+              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>End Date</mat-label>
+              <input matInput [(ngModel)]="task.endDate" [matDatepicker]="endPicker">
+              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+
+<p *ngIf="task.startDate && task.endDate">
+  Task Duration: {{ calculateTaskDuration(task.startDate, task.endDate) }} days
+</p>
+
+<!-- Add a submit button to trigger save or update -->
+<button type="button" *ngIf="!updateStep" class="btn btn-secondary" data-bs-dismiss="modal" (click)="save()">Save</button>
+<button type="button" *ngIf="updateStep" class="btn btn-secondary" data-bs-dismiss="modal" (click)="update()">Update</button>
+
+            
             <fieldset>
               <legend>Target</legend>
             
