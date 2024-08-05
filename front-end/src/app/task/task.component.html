@@ -87,12 +87,7 @@
 <p *ngIf="task.startDate && task.endDate">
   Task Duration: {{ calculateTaskDuration(task.startDate, task.endDate) }} days
 </p>
-
-<!-- Add a submit button to trigger save or update -->
-<button type="button" *ngIf="!updateStep" class="btn btn-secondary" data-bs-dismiss="modal" (click)="save()">Save</button>
-<button type="button" *ngIf="updateStep" class="btn btn-secondary" data-bs-dismiss="modal" (click)="update()">Update</button>
-
-            
+       
             <fieldset>
               <legend>Target</legend>
             

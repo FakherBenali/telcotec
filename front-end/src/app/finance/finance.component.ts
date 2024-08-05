@@ -1,18 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FinanceService } from '../finance.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { FinanceService } from '../finance.service';
+import { UserService } from '../services/user.service';
+import { TaskService } from '../services/task.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { UserService } from '../services/user.service';
-import { TaskService } from '../services/task.service';
-import { NavbarModule } from '../navbar/navbar.module';
+import { ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { NavbarModule } from "../navbar/navbar.module";
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-finance',
@@ -20,28 +22,28 @@ import { NavbarModule } from '../navbar/navbar.module';
   styleUrls: ['./finance.component.css'],
   standalone: true,
   imports: [
-    ReactiveFormsModule,
     CommonModule,
     MatTabsModule,
-    MatCardModule,  
+    MatCardModule,
     MatTableModule,
     MatListModule,
     MatButtonModule,
     MatInputModule,
     MatSelectModule,
+    ReactiveFormsModule,
     NavbarModule
   ]
 })
 export class FinanceComponent implements OnInit {
+  filteredFinances: any[] = [];
+  historyInvoices: any[] = [];
   summaryData: any[] = [];
   unpaidInvoices: any[] = [];
   paidInvoices: any[] = [];
   users: any[] = [];
   projects: any[] = [];
   financeForm: FormGroup;
-  filteredFinances: any[] = [];
-  selectedUserId: string = '';
-  selectedStatus: string = '';
+  selectedTab: string = 'all';
 
   summary: { totalPaid: number, totalUnpaid: number, totalAmount: number } = {
     totalPaid: 0,
@@ -54,7 +56,8 @@ export class FinanceComponent implements OnInit {
     private userService: UserService,
     private projectService: TaskService,
     private snackBar: MatSnackBar,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cd: ChangeDetectorRef // Add this
   ) {
     this.financeForm = this.fb.group({
       projectId: ['', Validators.required],
@@ -63,13 +66,14 @@ export class FinanceComponent implements OnInit {
       status: ['unpaid', Validators.required]
     });
   }
+  
 
   ngOnInit(): void {
+    this.loadUsers();
+    this.loadProjects();
     this.loadSummary();
     this.loadUnpaidInvoices();
     this.loadPaidInvoices();
-    this.loadUsers();
-    this.loadProjects();
   }
 
   loadUsers() {
@@ -91,12 +95,10 @@ export class FinanceComponent implements OnInit {
       this.financeService.createInvoice(this.financeForm.value).subscribe({
         next: () => {
           this.showSuccess('Invoice created successfully');
-          this.financeForm.reset({status: 'unpaid'});
+          this.financeForm.reset({ status: 'unpaid' });
           this.loadSummary();
           this.loadUnpaidInvoices();
           this.loadPaidInvoices();
-          this.loadUsers();
-          this.loadProjects();
         },
         error: (error) => this.showError('Failed to create invoice')
       });
@@ -106,31 +108,37 @@ export class FinanceComponent implements OnInit {
   loadSummary(): void {
     this.financeService.getSummary().subscribe({
       next: (data: any[]) => {
-        console.log(data);
+        console.log('Summary data received:', data);
         this.summaryData = data;
-        this.filterFinances();
+        this.calculateSummary();
       },
-      error: () => this.showError('Failed to load summary')
+      error: (err) => {
+        console.error('Error loading summary:', err);
+        this.showError('Failed to load summary');
+      }
     });
   }
+  
 
   loadUnpaidInvoices(): void {
     this.financeService.getUnpaidInvoices().subscribe({
       next: (data: any[]) => {
-        console.log("unpaid", data);
         this.unpaidInvoices = data;
         this.filterFinances();
+        this.calculateSummary();
       },
-      error: () => this.showError('Failed to load unpaid invoices')
+      error: () => this.showError('Failed to load paid invoices')
     });
   }
+  
+  
 
   loadPaidInvoices(): void {
     this.financeService.getPaidInvoices().subscribe({
       next: (data: any[]) => {
-        console.log(data);
         this.paidInvoices = data;
         this.filterFinances();
+        this.calculateSummary();
       },
       error: () => this.showError('Failed to load paid invoices')
     });
@@ -143,49 +151,45 @@ export class FinanceComponent implements OnInit {
         this.loadUnpaidInvoices();
         this.loadPaidInvoices();
         this.loadSummary();
-        this.loadUsers();
-        this.loadProjects();
       },
       error: () => this.showError('Failed to pay invoice')
     });
   }
 
+  onTabChange(tab: string) {
+    this.selectedTab = tab;
+    this.filterFinances();
+  }
+
   onUserSelect(event: Event) {
-    this.selectedUserId = (event.target as HTMLSelectElement).value;
-    this.filterFinances();
-  }
-  onStatusSelect(event: any) {
-    this.selectedStatus = event.target.value;
-    this.filterFinances();
+    const userId = (event.target as HTMLSelectElement).value;
+    this.filterFinances({ userId });
   }
 
-
-
-  filterFinances() {
-    const allFinances = [...this.summaryData];
-    if (this.selectedUserId) {
-      this.filteredFinances = allFinances.filter(f => f.userId === this.selectedUserId);
-    } else {
-      this.filteredFinances = allFinances;
-    }
-    if (this.selectedStatus) {
-      this.filteredFinances = allFinances.filter(f => this.selectedStatus === 'Paid' ? f.totalPaid > 0 : f.totalPaid == 0);
-    } else {
-      this.filteredFinances = allFinances;
-    }
-
-
-    this.calculateSummary();
+  onStatusSelect(event: Event) {
+    const status = (event.target as HTMLSelectElement).value;
+    this.filterFinances({ status });
   }
 
-  calculateSummary() {
-    this.summary = this.filteredFinances.reduce((acc, finance) => {
-      acc.totalAmount += finance.totalAmount;
-      acc.totalPaid += finance.totalPaid;
-      acc.totalUnpaid += finance.totalUnpaid;
-      return acc;
-    }, { totalPaid: 0, totalUnpaid: 0, totalAmount: 0 });
+  filterFinances(filters: { userId?: string, status?: string } = {}) {
+    this.filteredFinances = this.allInvoices.filter(invoice => {
+      return (!filters.userId || invoice.userId === filters.userId) &&
+             (!filters.status || (filters.status === 'Paid' ? invoice.totalPaid > 0 : invoice.totalPaid === 0));
+    });
   }
+
+  get allInvoices() {
+    return [...this.unpaidInvoices, ...this.paidInvoices];
+  }
+
+  private calculateSummary() {
+    this.summary.totalAmount = this.unpaidInvoices.concat(this.paidInvoices)
+      .reduce((acc, invoice) => acc + invoice.amount, 0);
+    this.summary.totalPaid = this.paidInvoices.reduce((acc, invoice) => acc + invoice.amount, 0);
+    this.summary.totalUnpaid = this.unpaidInvoices.reduce((acc, invoice) => acc + invoice.amount, 0);
+    console.log('Calculated summary:', this.summary);
+  }
+  
 
   private showSuccess(message: string): void {
     this.snackBar.open(message, 'Close', { duration: 3000 });
