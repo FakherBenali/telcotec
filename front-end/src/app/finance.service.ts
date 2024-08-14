@@ -6,7 +6,7 @@ import { catchError, map, Observable, of, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class FinanceService {
-  private apiUrl = 'http://localhost:3000/finance'; // Adjust the URL as needed
+  private apiUrl = 'http://localhost:3000/finance';
 
   constructor(private http: HttpClient) {}
 
@@ -28,47 +28,53 @@ export class FinanceService {
       catchError(this.handleError('getSummary', []))
     );
   }
-  
+
+  getTotalAmount(): Observable<number> {
+    return this.http.get<any[]>(`${this.apiUrl}/summary`).pipe(
+      map(invoices => invoices.reduce((sum, invoice) => sum + invoice.amount, 0)),
+      tap(total => console.log('Total amount:', total)),
+      catchError(this.handleError<number>('getTotalAmount', 0))
+    );
+  }
 
   getUnpaidInvoices(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/unpaid`).pipe(
       tap(data => console.log('Raw data received from getUnpaidInvoices:', data)),
       map(invoices => invoices.map(invoice => ({
-        financeId: invoice._id || 'N/A', // Default value if null/undefined
+        financeId: invoice._id || 'N/A',
         projectName: invoice.projectName || 'No Project Name',
         userId: invoice.user ? invoice.user._id : 'No User ID',
         userName: invoice.user ? `${invoice.user.firstName} ${invoice.user.lastName}` : 'Unknown User',
-        amount: invoice.amount || 0,
-        totalPaid: invoice.amount || 0
-      })))
-      
+        amount: invoice.amount || 0
+      }))),
+      catchError(this.handleError('getUnpaidInvoices', []))
+    );
+  }
+
+  getPaidInvoices(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/paid`).pipe(
+      tap(data => console.log('Raw data received from getPaidInvoices:', data)),
+      map(invoices => invoices.map(invoice => ({
+        financeId: invoice._id || 'N/A',
+        projectName: invoice.projectName || 'No Project Name',
+        userId: invoice.user ? invoice.user._id : 'No User ID',
+        userName: invoice.user ? `${invoice.user.firstName} ${invoice.user.lastName}` : 'Unknown User',
+        amount: invoice.totalAmount || 0 // Correctly map the `totalAmount`
+      }))),
+      catchError(this.handleError('getPaidInvoices', []))
     );
   }
   
   
-  
+
+  getInvoiceById(invoiceId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${invoiceId}`);
+  }
+
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       console.error(`${operation} failed: ${error.message}`);
       return of(result as T);
     };
-  }
-
-  
-  getPaidInvoices(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/paid`).pipe(
-      map(invoices => invoices.map(invoice => ({
-        financeId: invoice._id,
-        projectName: invoice.projectName,
-        userId: invoice.user._id,
-        userName: `${invoice.user.firstName} ${invoice.user.lastName}`,
-        amount: invoice.amount,
-        totalPaid: invoice.amount
-      })))
-    );
-  }
-
-  getInvoiceById(invoiceId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${invoiceId}`);
   }
 }

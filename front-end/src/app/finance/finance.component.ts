@@ -51,13 +51,14 @@ export class FinanceComponent implements OnInit {
     totalAmount: 0
   };
 
+  displayedColumns: string[] = ['projectName', 'userName', 'amount', 'status', 'action'];
+
   constructor(
     private financeService: FinanceService,
     private userService: UserService,
     private projectService: TaskService,
     private snackBar: MatSnackBar,
-    private fb: FormBuilder,
-    private cd: ChangeDetectorRef // Add this
+    private fb: FormBuilder
   ) {
     this.financeForm = this.fb.group({
       projectId: ['', Validators.required],
@@ -66,7 +67,6 @@ export class FinanceComponent implements OnInit {
       status: ['unpaid', Validators.required]
     });
   }
-  
 
   ngOnInit(): void {
     this.loadUsers();
@@ -96,19 +96,22 @@ export class FinanceComponent implements OnInit {
         next: () => {
           this.showSuccess('Invoice created successfully');
           this.financeForm.reset({ status: 'unpaid' });
-          this.loadSummary();
-          this.loadUnpaidInvoices();
-          this.loadPaidInvoices();
+          this.reloadInvoices();
         },
-        error: (error) => this.showError('Failed to create invoice')
+        error: () => this.showError('Failed to create invoice')
       });
     }
+  }
+
+  reloadInvoices(): void {
+    this.loadSummary();
+    this.loadUnpaidInvoices();
+    this.loadPaidInvoices();
   }
 
   loadSummary(): void {
     this.financeService.getSummary().subscribe({
       next: (data: any[]) => {
-        console.log('Summary data received:', data);
         this.summaryData = data;
         this.calculateSummary();
       },
@@ -118,7 +121,6 @@ export class FinanceComponent implements OnInit {
       }
     });
   }
-  
 
   loadUnpaidInvoices(): void {
     this.financeService.getUnpaidInvoices().subscribe({
@@ -127,11 +129,9 @@ export class FinanceComponent implements OnInit {
         this.filterFinances();
         this.calculateSummary();
       },
-      error: () => this.showError('Failed to load paid invoices')
+      error: () => this.showError('Failed to load unpaid invoices')
     });
   }
-  
-  
 
   loadPaidInvoices(): void {
     this.financeService.getPaidInvoices().subscribe({
@@ -145,46 +145,43 @@ export class FinanceComponent implements OnInit {
   }
 
   payInvoice(invoiceId: string): void {
-    this.financeService.payInvoice(invoiceId).subscribe({
-      next: () => {
-        this.showSuccess('Invoice paid successfully');
-        this.loadUnpaidInvoices();
-        this.loadPaidInvoices();
-        this.loadSummary();
-      },
-      error: () => this.showError('Failed to pay invoice')
-    });
-  }
+  this.financeService.payInvoice(invoiceId).subscribe({
+    next: () => {
+      this.showSuccess('Invoice paid successfully');
+      this.reloadInvoices();
+    },
+    error: () => this.showError('Failed to pay invoice')
+  });
+}
+
 
   onTabChange(tab: string) {
     this.selectedTab = tab;
     this.filterFinances();
   }
 
-  onUserSelect(event: Event) {
-    const userId = (event.target as HTMLSelectElement).value;
-    this.filterFinances({ userId });
-  }
-
-  onStatusSelect(event: Event) {
-    const status = (event.target as HTMLSelectElement).value;
-    this.filterFinances({ status });
-  }
-
   filterFinances(filters: { userId?: string, status?: string } = {}) {
-    this.filteredFinances = this.allInvoices.filter(invoice => {
-      return (!filters.userId || invoice.userId === filters.userId) &&
-             (!filters.status || (filters.status === 'Paid' ? invoice.totalPaid > 0 : invoice.totalPaid === 0));
-    });
+    if (this.selectedTab === 'all') {
+      this.filteredFinances = this.allInvoices.filter(invoice => {
+        return (!filters.userId || invoice.userId === filters.userId) &&
+               (!filters.status || (filters.status === 'Paid' ? invoice.totalPaid > 0 : invoice.totalPaid === 0));
+      });
+    } else if (this.selectedTab === 'paid') {
+      this.filteredFinances = this.paidInvoices;
+    } else if (this.selectedTab === 'unpaid') {
+      this.filteredFinances = this.unpaidInvoices;
+    } else if (this.selectedTab === 'history') {
+      this.filteredFinances = this.historyInvoices;
+    }
   }
+  
 
   get allInvoices() {
     return [...this.unpaidInvoices, ...this.paidInvoices];
   }
 
   private calculateSummary() {
-    this.summary.totalAmount = this.unpaidInvoices.concat(this.paidInvoices)
-      .reduce((acc, invoice) => acc + invoice.amount, 0);
+    this.summary.totalAmount = this.allInvoices.reduce((acc, invoice) => acc + invoice.amount, 0);
     this.summary.totalPaid = this.paidInvoices.reduce((acc, invoice) => acc + invoice.amount, 0);
     this.summary.totalUnpaid = this.unpaidInvoices.reduce((acc, invoice) => acc + invoice.amount, 0);
     console.log('Calculated summary:', this.summary);
@@ -199,3 +196,4 @@ export class FinanceComponent implements OnInit {
     this.snackBar.open(message, 'Close', { duration: 3000, panelClass: ['error-snackbar'] });
   }
 }
+

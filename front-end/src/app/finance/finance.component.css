@@ -46,12 +46,32 @@ th, td {
 
 th {
   background-color: #3f51b5;
-  color: #fff;
+  color: #8e8e8e;
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #bababa;
+}
+.finance-card {
+  border-radius: 8px;
+  box-shadow: 1 4px 8px rgba(7, 6, 6, 0.712);
+  transition: 0.3s;
+  margin: 10px;
+  align-items: center;
 }
 
+.finance-card:hover {
+  box-shadow: 0 8px 16px rgba(18, 11, 37, 0.827);
+}
 
-/* Modal styles, etc. */
+.finance-card mat-card-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.finance-card mat-card-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+}

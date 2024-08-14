@@ -11,23 +11,23 @@
           <mat-card-content>
             <div class="row">
               <div class="col-md-4">
-                <mat-card>
-                  <mat-card-title>Total Money</mat-card-title>
+                <mat-card class="finance-card">
+                  <mat-card-title>Total</mat-card-title>
                   <mat-card-content>
                     <h3>{{ summary.totalAmount | currency }}</h3>
                   </mat-card-content>
                 </mat-card>
               </div>
               <div class="col-md-4">
-                <mat-card>
+                <mat-card class="finance-card">
                   <mat-card-title>Total Paid</mat-card-title>
                   <mat-card-content>
                     <h3>{{ summary.totalPaid | currency }}</h3>
                   </mat-card-content>
                 </mat-card>
               </div>
-              <div class="col-md-4">
-                <mat-card>
+                <div class="col-md-4">
+                <mat-card class="finance-card">
                   <mat-card-title>Total Unpaid</mat-card-title>
                   <mat-card-content>
                     <h3>{{ summary.totalUnpaid | currency }}</h3>
@@ -35,14 +35,13 @@
                 </mat-card>
               </div>
             </div>
-            
 
             <mat-card class="mt-4">
               <mat-card-title>Invoices</mat-card-title>
               <mat-card-content>
                 <div>
                   <label for="userFilter">Filter by User:</label>
-                  <select id="userFilter" (change)="onUserSelect($event)">
+                  <select id="userFilter">
                     <option value="">All Users</option>
                     <option *ngFor="let user of users" [value]="user._id">
                       {{ user.firstname }} {{ user.lastname }}
@@ -51,7 +50,7 @@
                 </div>
                 <div>
                   <label for="statusFilter">Filter by Status:</label>
-                  <select id="statusFilter" (change)="onStatusSelect($event)">
+                  <select id="statusFilter">
                     <option value="">All</option>
                     <option value="Paid">Paid</option>
                     <option value="Unpaid">Unpaid</option>
@@ -61,12 +60,13 @@
                 <table class="table mt-4">
                   <thead>
                     <tr>
-                      <th>#</th>
+                      <th>Finance ID</th>
                       <th>Project Name</th>
                       <th>User Name</th>
                       <th>Total Amount</th>
                       <th>Status</th>
-                      <th>Action</th>
+                      <th>Pay</th>
+
                     </tr>
                   </thead>
                   <tbody>
@@ -76,7 +76,7 @@
                       <td>{{ element.userName }}</td>
                       <td>{{ element.totalAmount | currency }}</td>
                       <td>{{ element.totalPaid > 0 ? 'Paid' : 'Unpaid' }}</td>
-                      <td *ngIf="element.totalPaid == 0">
+                      <td *ngIf="element.totalPaid > 0">
                         <button mat-button color="primary" (click)="payInvoice(element.financeId)">Pay</button>
                       </td>
                     </tr>
@@ -91,6 +91,7 @@
                     </tr>
                   </tbody>
                 </table>
+                
               </mat-card-content>
             </mat-card>
           </mat-card-content>
@@ -117,14 +118,12 @@
             <mat-list>
               <mat-list-item *ngFor="let invoice of unpaidInvoices">
                 {{ invoice.projectName || 'No Project' }} - {{ invoice.user?.firstName || 'Unknown' }} {{ invoice.user?.lastName || 'User' }} - {{ invoice.amount | currency }}
-                <button mat-button color="primary" (click)="payInvoice(invoice._id)">Pay</button>
+                <button mat-button color="primary" (click)="payInvoice(invoice.financeId)">Pay</button>
               </mat-list-item>
             </mat-list>
           </mat-card-content>
         </mat-card>
       </mat-tab>
-      
-      
 
       <mat-tab label="History">
         <mat-card>

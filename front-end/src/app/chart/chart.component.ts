@@ -31,20 +31,22 @@ chartOptions: any;
   }
 
   fetchChartData(): void {
-    this.financeService.getUnpaidInvoices().subscribe(
-      (unpaidInvoices: any[]) => {
-        this.unpaidAmount = unpaidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
-        this.updateChart();
-      },
-      error => console.error('Error fetching unpaid invoices:', error)
-    );
-
+  
+  
     this.financeService.getPaidInvoices().subscribe(
       (paidInvoices: any[]) => {
         this.paidAmount = paidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
         this.updateChart();
       },
       error => console.error('Error fetching paid invoices:', error)
+    );
+  
+    this.financeService.getUnpaidInvoices().subscribe(
+      (unpaidInvoices: any[]) => {
+        this.unpaidAmount = unpaidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
+        this.updateChart();
+      },
+      error => console.error('Error fetching unpaid invoices:', error)
     );
   }
 
@@ -64,7 +66,7 @@ chartOptions: any;
           showInLegend: true,
           legendMarkerType: "square",
           dataPoints: [
-            { y: this.paidAmount, name: "Paid", color: "#058dc7" },
+            { y: this.paidAmount, name: "Paid", color: "#FF0000" },
             { y: this.unpaidAmount, name: "Unpaid", color: "#50b432" }
           ]
         }]
