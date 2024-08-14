@@ -1,9 +1,7 @@
 <div class="d-flex">
   <app-navbar></app-navbar>
   <div class="main-content">
-    <button mat-raised-button color="primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-      Create Invoice
-    </button>
+   
     <mat-tab-group>
       <mat-tab label="All">
         <mat-card>
@@ -38,6 +36,9 @@
 
             <mat-card class="mt-4">
               <mat-card-title>Invoices</mat-card-title>
+              <button mat-raised-button color="primary" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 20%; align-self: center;">
+                Create Invoice
+              </button>
               <mat-card-content>
                 <div>
                   <label for="userFilter">Filter by User:</label>
@@ -48,14 +49,7 @@
                     </option>
                   </select>
                 </div>
-                <div>
-                  <label for="statusFilter">Filter by Status:</label>
-                  <select id="statusFilter">
-                    <option value="">All</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Unpaid">Unpaid</option>
-                  </select>
-                </div>
+
 
                 <table class="table mt-4">
                   <thead>
@@ -66,7 +60,6 @@
                       <th>Total Amount</th>
                       <th>Status</th>
                       <th>Pay</th>
-
                     </tr>
                   </thead>
                   <tbody>
@@ -74,10 +67,10 @@
                       <td>{{ element.financeId }}</td>
                       <td>{{ element.projectName }}</td>
                       <td>{{ element.userName }}</td>
-                      <td>{{ element.totalAmount | currency }}</td>
-                      <td>{{ element.totalPaid > 0 ? 'Paid' : 'Unpaid' }}</td>
-                      <td *ngIf="element.totalPaid > 0">
-                        <button mat-button color="primary" (click)="payInvoice(element.financeId)">Pay</button>
+                      <td>{{ element.amount | currency }}</td>
+                      <td>{{ element.status }}</td>
+                      <td>
+                        <button  *ngIf="element.status == 'unpaid'" mat-button color="primary" (click)="payInvoice(element.financeId)">Pay</button>
                       </td>
                     </tr>
                     <tr>
@@ -85,8 +78,7 @@
                       <td></td>
                       <td><strong>Total: {{ summary.totalAmount | currency }}</strong></td>
                       <td>
-                        Paid: {{ summary.totalPaid | currency }}<br>
-                        Unpaid: {{ summary.totalUnpaid | currency }}
+                      </td><td>
                       </td>
                     </tr>
                   </tbody>
@@ -130,8 +122,8 @@
           <mat-card-title>Invoice History</mat-card-title>
           <mat-card-content>
             <mat-list>
-              <mat-list-item *ngFor="let invoice of historyInvoices">
-                {{ invoice.projectName }} - {{ invoice.userName }} - {{ invoice.amount | currency }} - {{ invoice.status }}
+              <mat-list-item *ngFor="let invoice of allInvoices">
+                {{ invoice.projectName }} - {{ invoice.userName }} - {{ invoice.amount | currency }} - Date {{ invoice.date }}
               </mat-list-item>
             </mat-list>
           </mat-card-content>

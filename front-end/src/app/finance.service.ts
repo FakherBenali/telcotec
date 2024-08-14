@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of, tap } from 'rxjs';
+import { data } from 'jquery';
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +46,10 @@ export class FinanceService {
         projectName: invoice.projectName || 'No Project Name',
         userId: invoice.user ? invoice.user._id : 'No User ID',
         userName: invoice.user ? `${invoice.user.firstName} ${invoice.user.lastName}` : 'Unknown User',
-        amount: invoice.amount || 0
+        amount: invoice.amount || 0,
+        status: invoice.status || 'N/A',
+        date: invoice.date || 'no Date'
+
       }))),
       catchError(this.handleError('getUnpaidInvoices', []))
     );
@@ -59,7 +63,10 @@ export class FinanceService {
         projectName: invoice.projectName || 'No Project Name',
         userId: invoice.user ? invoice.user._id : 'No User ID',
         userName: invoice.user ? `${invoice.user.firstName} ${invoice.user.lastName}` : 'Unknown User',
-        amount: invoice.totalAmount || 0 // Correctly map the `totalAmount`
+        amount: invoice.totalAmount || 0,
+        status: invoice.status || 'N/A',
+        date: invoice.date || 'no Date'
+
       }))),
       catchError(this.handleError('getPaidInvoices', []))
     );
