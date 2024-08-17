@@ -1,32 +1,90 @@
-<app-navbar>
-</app-navbar>
-<div class="row">
-    <div class="col-6 mx-auto">
-      <form class="row mt-5">
-        <div class="mt-5 col-3">
-            <!-- agent-form.component.html -->
-
-            <form (ngSubmit)="onSubmit()">
-                <div>
-                <label for="email">Email:</label>
-                <input type="email" id="email" [(ngModel)]="email" name="email" required>
+<div class="row justify-content-center align-items-center vh-100">
+  <div class="col-6">
+    <app-navbar></app-navbar>
+    <div class="mt-5">
+      <mat-tab-group (selectedTabChange)="onTabChange($event)">
+        <mat-tab label="First"> 
+          <h2 class="text-center">Create Agent Account</h2>
+          <form (ngSubmit)="onSubmit()" class="form-container">
+            <div class="form-group">
+              <label for="username">Username:</label>
+              <input type="text" id="username" [(ngModel)]="username" name="username" required class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="domain">Domain:</label>
+              <input type="text" id="domain" [value]="domain" readonly class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="password">Password:</label>
+              <input type="password" id="password" [(ngModel)]="password" name="password" required class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Permissions:</label>
+              <div class="permissions-container">
+                <div *ngFor="let permission of permissions" class="form-check">
+                  <input type="checkbox" [(ngModel)]="selectedPermissions[permission.id]" name="permissions" class="form-check-input"> 
+                  <label class="form-check-label">{{ permission.name }}</label>
                 </div>
-                <div>
-                <label for="password">Password:</label>
-                <input type="password" id="password" [(ngModel)]="password" name="password" required>
+              </div>
+            </div>
+            <button type="submit" [disabled]="!username || !password" class="btn btn-primary btn-block">Submit</button>
+          </form>
+        </mat-tab>
+        <mat-tab label="Second">
+          <h2 class="text-center">Create SuperUser Account</h2> 
+          <form (ngSubmit)="onSubmit()" class="form-container">
+            <div class="form-group">
+              <label for="username">Username:</label>
+              <input type="text" id="username" [(ngModel)]="username" name="username" required class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="domain">Domain:</label>
+              <input type="text" id="domain" [value]="domain" readonly class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="password">Password:</label>
+              <input type="password" id="password" [(ngModel)]="password" name="password" required class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Permissions:</label>
+              <div class="permissions-container">
+                <div *ngFor="let permission of permissions" class="form-check">
+                  <input type="checkbox" [(ngModel)]="selectedPermissions[permission.id]" name="permissions" class="form-check-input"> 
+                  <label class="form-check-label">{{ permission.name }}</label>
                 </div>
-                <div>
-                <label>Permissions:</label><br>
-                <div *ngFor="let permission of permissions">
-                    <input type="checkbox" [(ngModel)]="selectedPermissions[permission.id]" name="permissions"> {{ permission.name }}
+              </div>
+            </div>
+            <button type="submit" [disabled]="!username || !password" class="btn btn-primary btn-block">Submit</button>
+          </form>  
+        </mat-tab>
+        <mat-tab label="Third">
+          <h2 class="text-center">Create Partner Account</h2>
+          <form (ngSubmit)="onSubmit()" class="form-container">
+            <div class="form-group">
+              <label for="username">Username:</label>
+              <input type="text" id="username" [(ngModel)]="username" name="username" required class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="domain">Domain:</label>
+              <input type="text" id="domain" [value]="domain" readonly class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="password">Password:</label>
+              <input type="password" id="password" [(ngModel)]="password" name="password" required class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Permissions:</label>
+              <div class="permissions-container">
+                <div *ngFor="let permission of permissions" class="form-check">
+                  <input type="checkbox" [(ngModel)]="selectedPermissions[permission.id]" name="permissions" class="form-check-input"> 
+                  <label class="form-check-label">{{ permission.name }}</label>
                 </div>
-                </div>
-                <button type="submit" [disabled]="!email || !password">Submit</button>
-            </form>
-  
-        </div>
-      </form>
-
+              </div>
+            </div>
+            <button type="submit" [disabled]="!username || !password" class="btn btn-primary btn-block">Submit</button>
+          </form>  
+        </mat-tab>
+      </mat-tab-group>
     </div>
+  </div>
 </div>
-

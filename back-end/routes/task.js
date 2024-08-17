@@ -14,7 +14,7 @@ async function getUnusedTasks() {
       const unusedTasks = await Task.aggregate([
         {
           $lookup: {
-            from: 'finances', // The name of your Finance collection in MongoDB
+            from: 'finances', 
             localField: '_id',
             foreignField: 'projectId',
             as: 'financeDocuments'
@@ -27,7 +27,7 @@ async function getUnusedTasks() {
         },
         {
           $project: {
-            financeDocuments: 0 // Remove the financeDocuments field from the result
+            financeDocuments: 0
           }
         }
       ]);
@@ -59,11 +59,13 @@ router.post('/save' ,upload.fields([{ name: 'photo' }]) , (req,res)=>{
      
     let data = req.body;
     console.log(data);
+    target: req.body.target
 
     let task = new Task(data)
     if (req.files['photo'] ) {
         // Assuming __filename contains the path of uploaded files
         task.photo = req.files['photo'][0].path;
+        
     }
     
     console.log(task);
@@ -110,6 +112,7 @@ router.get('/all' , (req,res)=>{
 
 router.get('/getbyid/:id' , (req,res)=>{
     let id = req.params.id;
+    target: req.body.target
 
     Task.findOne({_id : id})
     .then(
@@ -151,14 +154,15 @@ router.put('/update/:id', upload.fields([{ name: 'photo' }]), (req, res) => {
                 return res.status(404).send({ message: "Task not found" });
             }
 
-            // Update task properties
             task.name = updatedData.name || task.name;
             task.location = updatedData.location || task.location;
             task.description = updatedData.description || task.description;
-            task.number = updatedData.number || task.number;
-            task.price = updatedData.price || task.price;
+            task.budget = updatedData.budget || task.budget;
+            task.depenses = updatedData.depenses || task.depenses;
+            task.type = updatedData.type || task.type;
+            task.date = updatedData.date || task.date;
+            task.target = updatedData.target || task.target;
 
-            // Update photo if exists
             if (req.files['photo']) {
                 task.photo = req.files['photo'][0].path;
             }

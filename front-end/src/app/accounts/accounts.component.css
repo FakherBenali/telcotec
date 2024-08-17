@@ -1,0 +1,37 @@
+/* Ensure the parent div takes the full height of the viewport */
+.vh-100 {
+    height: 100vh;
+  }
+  
+  /* Center the row both horizontally and vertically */
+  .row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Center form elements and add spacing */
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .form-group {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .form-check {
+    display: flex;
+    align-items: center;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+  
+  .btn-block {
+    width: 100%;
+  }
+  
