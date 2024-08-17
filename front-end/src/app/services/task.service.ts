@@ -1,5 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -36,4 +39,13 @@ export class TaskService {
     return this.http.put(this.url + "/update/"+id , date);
 
   }
+  
+  createTask(taskData: any): Observable<any> {
+    return this.http.post('/api/tasks', taskData);
+  }
+
+  calculatePrice(target: any): Observable<any> {
+    return this.http.post('/api/calculate-price', target);
+  }
+  
 }

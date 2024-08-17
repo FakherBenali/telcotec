@@ -1,17 +1,77 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TaskService } from '../services/task.service';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NavbarModule } from '../navbar/navbar.module';
+
+
 @Component({
   selector: 'app-task',
-  standalone: true,
-  imports: [NavbarModule, CommonModule,FormsModule ],
   templateUrl: './task.component.html',
-  styleUrl: './task.component.css'
+  styleUrls: ['./task.component.css'],
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    NavbarModule,
+  ]
 })
 export class TaskComponent {
+  taskForm: FormGroup;
+  eligibleUsers: number | undefined;
+  totalPrice: number | undefined;
+
+  constructor(private TaskService: TaskService , private router: Router,private fb: FormBuilder, private taskService: TaskService) {
+    this.fetchTask();
+    this.taskForm = this.fb.group({
+      taskName: ['', Validators.required],
+      taskType: ['', Validators.required],
+      description: [''],
+      sex: [''],
+      ageRange: this.fb.group({
+        min: [''],
+        max: ['']
+      }),
+      zone: [''],
+      startDate: ['', Validators.required],
+      endDate: ['', Validators.required]
+    });
+  }
+
+  onSubmit() {
+    if (this.taskForm.valid) {
+      const taskData = this.taskForm.value;
+      taskData.target = {
+        sex: taskData.sex,
+        ageRange: [taskData.ageRange.min, taskData.ageRange.max],
+        zone: taskData.zone
+      };
+
+      this.taskService.createTask(taskData).subscribe(response => {
+        console.log('Task created', response);
+        // Handle success
+      }, error => {
+        console.error('Error creating task', error);
+        // Handle error
+      });
+    }
+  }
+
+  calculatePrice() {
+    const target = {
+      sex: this.taskForm.get('sex')?.value,
+      ageRange: [this.taskForm.get('ageRange.min')?.value, this.taskForm.get('ageRange.max')?.value],
+      zone: this.taskForm.get('zone')?.value
+    };
+
+    this.taskService.calculatePrice(target).subscribe(response => {
+      this.eligibleUsers = response.numberOfEligibleUsers;
+      this.totalPrice = response.totalPrice;
+    }, error => {
+      console.error('Error calculating price', error);
+    });
+  }
 
   // date = new Date().getTime();
   tasks: any = []
@@ -29,13 +89,9 @@ export class TaskComponent {
   updateStep: boolean = false
   idUpdate: any;
   
-  constructor( private TaskService: TaskService , private router: Router){  }
 
-  ngOnInit(): void {
 
-    this.fetchTask();
 
-  }
 
   fetchTask(): void {
     this.TaskService.getAll()
@@ -125,5 +181,4 @@ export class TaskComponent {
       )
 
   }
-
 }

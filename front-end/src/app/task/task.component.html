@@ -1,62 +1,114 @@
 <app-navbar>
 </app-navbar>
 <div class="row">
-    <div class="col-6 mx-auto">
-        <button data-bs-toggle="modal" data-bs-target="#exampleModal" class="mt-5 btn btn-success">Create task</button>
+  <div class="col-6 mx-auto">
+    <button data-bs-toggle="modal" data-bs-target="#exampleModal" class="mt-5 btn btn-success">Create Task</button>
 
-        <table class="table mt-5">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Location</th>
-                <th>Description</th>
-                <th>Number</th>
-                <th>Price</th>
-                <th>Photo</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let task of tasks">
-                <td>{{ task.name}}</td>
-                <td>{{ task.location}}</td>
-                <td>{{ task.description}}</td>
-                <td>{{ task.number }}</td>
-                <td>{{ task.price }}</td>
-                <td><img src="{{ replaceText(task.photo) }}" alt="Task Photo" width="100"></td>
-                <td>{{ task.price }}</td>
-                <td>    <button (click)="edit( task._id )" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning">Edit</button></td>
-                <td>    <button (click)="delete( task._id )" data-bs-toggle="modal" class="btn btn-danger">Delete</button></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Create new task</h5>
-                  <button type="button" class="btn-close" (click)="updateStep = false" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label>Name</label>
-                    <input [(ngModel)]="task.name" type="text" class="form-control m-1" placeholder="Name">
-                    <label>Location</label>
-                    <input [(ngModel)]="task.location" type="text" class="form-control m-1" placeholder="Location">
-                    <label>Description</label>
-                    <input [(ngModel)]="task.description" type="text" class="form-control m-1" placeholder="Description">
-                    <label>Number</label>
-                    <input [(ngModel)]="task.number" type="text" class="form-control m-1" placeholder="Number">
-                    <label>Price</label>
-                    <input [(ngModel)]="task.price" type="text" class="form-control m-1" placeholder="Price">
-                    <label>Photo</label>
-                    <input type="file" (change)="selectPhoto($event)" class="form-control m-1" placeholder="Price" accept="image/*">
-                </div>
-                <div class="modal-footer">
-                  <button type="button" *ngIf="!updateStep" class="btn btn-secondary" data-bs-dismiss="modal" (click)="save()">Save</button>
-                  <button type="button" *ngIf="updateStep" class="btn btn-secondary" data-bs-dismiss="modal" (click)="update()">Update</button>
-                  <!-- Additional buttons or actions can be added here -->
+    <table class="table mt-5">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Location</th>
+          <th>Description</th>
+          <th>Number</th>
+          <th>Price</th>
+          <th>Photo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let task of tasks">
+          <td>{{ task.name}}</td>
+          <td>{{ task.location}}</td>
+          <td>{{ task.description}}</td>
+          <td>{{ task.number }}</td>
+          <td>{{ task.price }}</td>
+          <td><img src="{{ replaceText(task.photo) }}" alt="Task Photo" width="100"></td>
+          <td>{{ task.price }}</td>
+          <td> <button (click)="edit( task._id )" data-bs-toggle="modal" data-bs-target="#exampleModal"
+              class="btn btn-warning">Edit</button></td>
+          <td> <button (click)="delete( task._id )" data-bs-toggle="modal" class="btn btn-danger">Delete</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+<div class="row">
+  <div class="col-6 mx-auto">
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Create new Task</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="container mt-4">
+              <div class="mb-3">
+                <label for="taskName" class="form-label">Task Name</label>
+                <input id="taskName" formControlName="taskName" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="taskType" class="form-label">Task Type</label>
+                <select id="taskType" formControlName="taskType" class="form-select" required>
+                  <!-- Add your options here -->
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Description (Optional)</label>
+                <textarea id="description" formControlName="description" class="form-control"></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="sex" class="form-label">Target Gender</label>
+                <select id="sex" formControlName="sex" class="form-select">
+                  <option value="">All</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="ageRange.min" class="form-label">Age Range</label>
+                <div class="d-flex">
+                  <input id="ageRange.min" formControlName="ageRange.min" type="number" class="form-control me-2" placeholder="Min Age">
+                  <input id="ageRange.max" formControlName="ageRange.max" type="number" class="form-control" placeholder="Max Age">
                 </div>
               </div>
-            </div>
+              <div class="mb-3">
+                <label for="zone" class="form-label">Zone</label>
+                <input id="zone" formControlName="zone" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="startDate" class="form-label">Start Date</label>
+                <input id="startDate" formControlName="startDate" type="date" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="endDate" class="form-label">End Date</label>
+                <input id="endDate" formControlName="endDate" type="date" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <button type="button" (click)="calculatePrice()" class="btn btn-primary">Calculate Price</button>
+              </div>
+              <div *ngIf="eligibleUsers !== undefined" class="mb-3">
+                <p>Eligible Users: {{ eligibleUsers }}</p>
+                <p>Total Price: {{ totalPrice }}</p>
+              </div>
+              <div>
+                <button type="submit" class="btn btn-success">Create Task</button>
+              </div>
+            </form>
+            
+
+            <!-- Additional buttons or actions can be added here -->
           </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
