@@ -5,7 +5,7 @@
 
         <li  class="navbar-item"  *ngIf="permissions.includes('66693007e9b2b5672be9fcbf')" ><a href="/task" routerLinkActive="active">Tasks</a></li>
 
-        <li class="navbar-item"><a href="/accounts"  *ngIf="isadmin">Manage Account</a></li>
+        <li class="navbar-item"><a href="/accounts" *ngIf="permissions.includes('66acc307a6affdf0bc0c9deb')"  >Manage Account</a></li>
         <li class="navbar-item" *ngIf="permissions.includes('66693082e9b2b5672be9fcc3')"><a href="/finance" routerLinkActive="active">Finance</a></li>
         <li class="navbar-item"  *ngIf="permissions.includes('66693050e9b2b5672be9fcc1')" ><a href="/users" routerLinkActive="active">Users</a></li>
           

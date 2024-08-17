@@ -43,89 +43,55 @@ router.get('/project/:projectId', async (req, res) => {
   }
 });
 
-// Pay Invoice
 router.post('/pay/:id', async (req, res) => {
+  try {
+    const financeId = req.params.id;
+    const updatedFinance = await Finance.findByIdAndUpdate(
+      financeId, 
+      { status: 'paid' }, 
+      { new: true }
+    );
+
+    if (!updatedFinance) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
+
+    res.json(updatedFinance);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+  
+
+
+  router.get('/summary', async (req, res) => {
     try {
-      const financeId = req.params.id;
-      const updatedFinance = await Finance.findByIdAndUpdate(financeId, { status: 'paid' }, { new: true });
+      const summary = await Finance.aggregate([
+        {
+          $group: {
+            _id: null, // This will aggregate over all documents
+            totalAmount: { $sum: '$amount' },
+            totalPaid: {
+              $sum: {
+                $cond: [{ $eq: ['$status', 'paid'] }, '$amount', 0],
+              },
+            },
+            totalUnpaid: {
+              $sum: {
+                $cond: [{ $eq: ['$status', 'unpaid'] }, '$amount', 0],
+              },
+            },
+          },
+        },
+      ]);
   
-      if (!updatedFinance) {
-        return res.status(404).json({ message: 'Invoice not found' });
-      }
-  
-      res.json(updatedFinance);
+      res.json(summary[0] || { totalAmount: 0, totalPaid: 0, totalUnpaid: 0 });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   });
   
-
-
-// Summary Table
-router.get('/summary', async (req, res) => {
-  try {
-    console.log('Starting aggregation');
-    const summary = await Finance.aggregate([
-      {
-        $group: {
-          _id: {            financeId: '$_id',  // Include the finance _id here
-            projectId: '$projectId', userId: '$userId' },
-          totalAmount: { $sum: '$amount' },
-          totalPaid: {
-            $sum: {
-              $cond: [{ $eq: ['$status', 'paid'] }, '$amount', 0],
-            },
-          },
-          totalUnpaid: {
-            $sum: {
-              $cond: [{ $eq: ['$status', 'unpaid'] }, '$amount', 0],
-            },
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: 'tasks',
-          localField: '_id.projectId',
-          foreignField: '_id',
-          as: 'project',
-        },
-      },
-      {
-        $unwind: { path: '$project', preserveNullAndEmptyArrays: true },
-      },
-      {
-        $lookup: {
-          from: 'users',
-          localField: '_id.userId',
-          foreignField: '_id',
-          as: 'user',
-        },
-      },
-      {
-        $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
-      },
-      {
-        $project: {
-          _id: 0,
-          financeId: '$_id.financeId',
-          projectId: '$_id.projectId',
-          projectName: '$project.name', // Changed from 'title' to 'name' based on your Task schema
-          userId: '$_id.userId',
-          userName: { $concat: ['$user.firstname', ' ', '$user.lastname'] }, // Concatenating first and last name
-          totalAmount: 1,
-          totalPaid: 1,
-          totalUnpaid: 1,
-        },
-      },
-    ]);
-
-    console.log('Aggregation result:', summary);
-    res.json(summary);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 
 // Get all unpaid invoices
@@ -134,11 +100,10 @@ router.get('/unpaid', async (req, res) => {
     const unpaidInvoices = await Finance.find({ status: 'unpaid' })
       .populate({
         path: 'userId',
-        select: 'firstname lastname' // Select only the firstname and lastname fields from User
+        select: 'firstname lastname' 
       })
-      .populate('projectId', 'name'); // Optionally populate the project name if needed
+      .populate('projectId', 'name');
 
-    // Map the results to include user details in a more friendly format
     const formattedInvoices = unpaidInvoices.map(invoice => ({
       _id: invoice._id,
       amount: invoice.amount,
@@ -160,48 +125,38 @@ router.get('/unpaid', async (req, res) => {
     }
   });
 
-// Get all paid invoices
-router.get('/paid', async (req, res) => {
+  router.get('/paid', async (req, res) => {
     try {
       const paidInvoices = await Finance.find({ status: 'paid' })
-      .populate({
-        path: 'userId',
-        select: 'firstname lastname' // Select only the firstname and lastname fields from User
-      })
-      .populate('projectId', 'name'); // Optionally populate the project name if needed
-
-    // Map the results to include user details in a more friendly format
-    const formattedInvoices = paidInvoices.map(invoice => ({
-      _id: invoice._id,
-      amount: invoice.amount,
-      status: invoice.status,
-      date: invoice.date,
-      projectId: invoice.projectId,
-      projectName: invoice.projectId ? invoice.projectId.name : null,
-      user: invoice.userId ? {
-        firstName: invoice.userId.firstname,
-        lastName: invoice.userId.lastname
-      } : null
-    }));
-
-    res.json(formattedInvoices);
+        .populate({
+          path: 'userId',
+          select: 'firstname lastname' // Select only the firstname and lastname fields from User
+        })
+        .populate('projectId', 'name'); // Optionally populate the project name if needed
+  
+      console.log('Paid invoices from DB:', paidInvoices);
+  
+      const formattedInvoices = paidInvoices.map(invoice => ({
+        _id: invoice._id,
+        totalAmount: invoice.amount,
+        status: invoice.status,
+        date: invoice.date,
+        projectId: invoice.projectId,
+        projectName: invoice.projectId ? invoice.projectId.name : null,
+        user: invoice.userId ? {
+          firstName: invoice.userId.firstname,
+          lastName: invoice.userId.lastname
+        } : null
+      }));
+  
+      console.log('Formatted paid invoices:', formattedInvoices);
+  
+      res.json(formattedInvoices);
     } catch (error) {
-      console.log(error)
+      console.log('Error fetching paid invoices:', error);
       res.status(500).json({ error: error.message });
     }
   });
-
-
-// Show details of a specific invoice
-router.get('/:id', async (req, res) => {
-  try {
-    const invoice = await Finance.findById(req.params.id);
-    if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
-    res.json(invoice);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 
 module.exports = router;

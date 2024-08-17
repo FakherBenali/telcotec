@@ -1,147 +1,184 @@
-
-
-<mat-tab-group>
-    <mat-tab label="Summary">
-      <mat-card>
-        <mat-card-title>Financial Summary<br>
-    <button data-bs-toggle="modal" data-bs-target="#exampleModal" class="mt-5 btn btn-success">Create invoice</button>
-
-        </mat-card-title>
-        <mat-card-content>
-            <div>
-                <label for="userFilter">Filter by User:</label>
-                <select id="userFilter" (change)="onUserSelect($event)">
-                  <option value="">All Users</option>
-                  <option *ngFor="let user of users" [value]="user._id">
-                    {{user.firstname}} {{user.lastname}}
-                  </option>
-                </select>
+<div class="d-flex">
+  <app-navbar></app-navbar>
+  <div class="main-content">
+   
+    <mat-tab-group>
+      <mat-tab label="All">
+        <mat-card>
+          <mat-card-title>Financial Summary</mat-card-title>
+          <mat-card-content>
+            <div class="row">
+              <div class="col-md-4">
+                <mat-card class="finance-card">
+                  <mat-card-title>Total</mat-card-title>
+                  <mat-card-content>
+                    <h3>{{ summary.totalAmount | currency }}</h3>
+                  </mat-card-content>
+                </mat-card>
               </div>
-              <div>
-                <label for="statusFilter">Filter by Status:</label>
-                <select id="statusFilter" (change)="onStatusSelect($event)">
-                  <option value="">All</option>
-                  <option value="Paid">Paid</option>
-                  <option value="Unpaid">Unpaid</option>
-                </select>
+              <div class="col-md-4">
+                <mat-card class="finance-card">
+                  <mat-card-title>Total Paid</mat-card-title>
+                  <mat-card-content>
+                    <h3>{{ summary.totalPaid | currency }}</h3>
+                  </mat-card-content>
+                </mat-card>
               </div>
+                <div class="col-md-4">
+                <mat-card class="finance-card">
+                  <mat-card-title>Total Unpaid</mat-card-title>
+                  <mat-card-content>
+                    <h3>{{ summary.totalUnpaid | currency }}</h3>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
 
-        <table class="table mt-5">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Project Name</th>
-                <th>User Name</th>
-                <th>Total Amount</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let element of filteredFinances">
-                <td>{{ element.financeId }}</td>
-                <td>{{ element.projectName }}</td>
-                <td>{{ element.userName }}</td>
-                <td>{{element.totalAmount | currency}}</td>
-                <td>{{element.totalPaid > 0 ? 'Paid' : 'Unpaid'}}</td>
-                <td *ngIf="element.totalPaid == 0">              <button mat-button color="primary" (click)="payInvoice(element.financeId)">Pay</button>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2"><strong>Summary</strong></td>
-                <td></td>
-                <td><strong>total: {{summary.totalAmount | currency}}</strong></td>
-                <td>
-                  Paid: {{summary.totalPaid | currency}}<br>
-                  Unpaid: {{summary.totalUnpaid | currency}}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </mat-card-content>
-      </mat-card>
-    </mat-tab>
-  
-    <!-- <mat-tab label="Unpaid Invoices">
-      <mat-card>
-        <mat-card-title>Unpaid Invoices</mat-card-title>
-        <mat-card-content>
-          <mat-list>
-            <mat-list-item *ngFor="let invoice of unpaidInvoices">
-              {{invoice.projectName}} - {{invoice.user?.firstName}} {{invoice.user?.lastName}} - {{invoice.amount | currency}}
-              <button mat-button color="primary" (click)="payInvoice(invoice._id)">Pay</button>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
-    </mat-tab>
-  
-    <mat-tab label="Paid Invoices">
-      <mat-card>
-        <mat-card-title>Paid Invoices</mat-card-title>
-        <mat-card-content>
-          <mat-list>
-            <mat-list-item *ngFor="let invoice of paidInvoices">
-              {{invoice.projectName}} -  {{invoice.user?.firstName}} {{invoice.user?.lastName}}  - {{invoice.amount | currency}}
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
-    </mat-tab> -->
-  </mat-tab-group>
-
-
- 
-<div class="row">
-    <div class="col-6 mx-auto">
-
-          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Create new invoice</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <mat-card class="mt-4">
+              <mat-card-title>Invoices</mat-card-title>
+              <button mat-raised-button color="primary" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 20%; align-self: center;">
+                Create Invoice
+              </button>
+              <mat-card-content>
+                <div>
+                  <label for="userFilter">Filter by User:</label>
+                  <select id="userFilter">
+                    <option value="">All Users</option>
+                    <option *ngFor="let user of users" [value]="user._id">
+                      {{ user.firstname }} {{ user.lastname }}
+                    </option>
+                  </select>
                 </div>
-                <div class="modal-body">
-                    <form [formGroup]="financeForm" (ngSubmit)="onSubmit()">
-                        <div>
-                            <label for="userId">User</label>
-                            <select id="userId" formControlName="userId" required>
-                              <option value="">Select a user</option>
-                              <option *ngFor="let user of users" [value]="user._id">
-                                {{user.firstname}} {{user.lastname}}
-                              </option>
-                            </select>
-                          </div>
-                        
-                          <div>
-                            <label for="projectId">Project</label>
-                            <select id="projectId" formControlName="projectId" required>
-                              <option value="">Select a project</option>
-                              <option *ngFor="let project of projects" [value]="project._id">
-                                {{project.name}}
-                              </option>
-                            </select>
-                          </div>
-              
 
-                          <label>Amount</label>
-                          <input matInput type="number" formControlName="amount" required>
-              
-                          <label>Status</label>
-                          <select formControlName="status" required>
-                            <option value="unpaid">Unpaid</option>
-                            <option value="paid">Paid</option>
-                          </select>
-                <div class="modal-footer">
 
-                          <button mat-raised-button color="primary" type="submit" [disabled]="!financeForm.valid"  data-bs-dismiss="modal" aria-label="Close">Create Invoice</button>
-                        </div>
-                        
-                      </form>
-                  <!-- Additional buttons or actions can be added here -->
+                <table class="table mt-4">
+                  <thead>
+                    <tr>
+                      <th>Finance ID</th>
+                      <th>Project Name</th>
+                      <th>User Name</th>
+                      <th>Total Amount</th>
+                      <th>Status</th>
+                      <th>Pay</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let element of filteredFinances">
+                      <td>{{ element.financeId }}</td>
+                      <td>{{ element.projectName }}</td>
+                      <td>{{ element.userName }}</td>
+                      <td>{{ element.amount | currency }}</td>
+                      <td>{{ element.status }}</td>
+                      <td>
+                        <button  *ngIf="element.status == 'unpaid'" mat-button color="primary" (click)="payInvoice(element.financeId)">Pay</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2"><strong>Summary</strong></td>
+                      <td></td>
+                      <td><strong>Total: {{ summary.totalAmount | currency }}</strong></td>
+                      <td>
+                      </td><td>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+              </mat-card-content>
+            </mat-card>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+
+      <mat-tab label="Paid">
+        <mat-card>
+          <mat-card-title>Paid Invoices</mat-card-title>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let invoice of paidInvoices">
+                {{ invoice.projectName }} - {{ invoice.userName }} - {{ invoice.amount | currency }}
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+
+      <mat-tab label="Unpaid">
+        <mat-card>
+          <mat-card-title>Unpaid Invoices</mat-card-title>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let invoice of unpaidInvoices">
+                {{ invoice.projectName || 'No Project' }} - {{ invoice.user?.firstName || 'Unknown' }} {{ invoice.user?.lastName || 'User' }} - {{ invoice.amount | currency }}
+                <button mat-button color="primary" (click)="payInvoice(invoice.financeId)">Pay</button>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+
+      <mat-tab label="History">
+        <mat-card>
+          <mat-card-title>Invoice History</mat-card-title>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let invoice of allInvoices">
+                {{ invoice.projectName }} - {{ invoice.userName }} - {{ invoice.amount | currency }} - Date {{ invoice.date }}
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+    </mat-tab-group>
+
+    <div class="row">
+      <div class="col-6 mx-auto">
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create new invoice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form [formGroup]="financeForm" (ngSubmit)="onSubmit()">
+                  <div>
+                    <label for="userId">User</label>
+                    <select id="userId" formControlName="userId" required>
+                      <option value="">Select a user</option>
+                      <option *ngFor="let user of users" [value]="user._id">
+                        {{ user.firstname }} {{ user.lastname }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label for="projectId">Project</label>
+                    <select id="projectId" formControlName="projectId" required>
+                      <option value="">Select a project</option>
+                      <option *ngFor="let project of projects" [value]="project._id">
+                        {{ project.name }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <label>Amount</label>
+                  <input matInput type="number" formControlName="amount" required>
+
+                  <label>Status</label>
+                  <select formControlName="status" required>
+                    <option value="unpaid">Unpaid</option>
+                    <option value="paid">Paid</option>
+                  </select>
+                  <div class="modal-footer">
+                    <button mat-raised-button color="primary" type="submit" [disabled]="!financeForm.valid" data-bs-dismiss="modal" aria-label="Close">Create Invoice</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

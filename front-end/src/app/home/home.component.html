@@ -1,5 +1,39 @@
-<app-navbar>
-</app-navbar>
-<app-cover>
-    
-</app-cover>
+<app-cover></app-cover>
+<div class="container mt-4">
+  <div class="d-flex justify-content-center">
+    <div class="accordion-container">
+      <div class="accordion" id="accordionExample">
+        <!-- Welcome Message -->
+        <div class="welcome-message mb-3">
+          <h3>Welcome {{ role }} {{ username }}</h3>
+        </div>
+        <!-- Accordion Items -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingChart">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChart" aria-expanded="true" aria-controls="collapseChart">
+              Chart
+            </button>
+          </h2>
+          <div id="collapseChart" class="accordion-collapse collapse show" aria-labelledby="headingChart" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <app-chart></app-chart>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingRevenues">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRevenues" aria-expanded="false" aria-controls="collapseRevenues">
+              Revenues
+            </button>
+          </h2>
+          <div id="collapseRevenues" class="accordion-collapse collapse" aria-labelledby="headingRevenues" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <app-revenues></app-revenues>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-navbar></app-navbar>
