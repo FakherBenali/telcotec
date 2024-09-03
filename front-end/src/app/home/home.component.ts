@@ -17,17 +17,17 @@ import { MatExpansionModule } from '@angular/material/expansion';
 export class HomeComponent implements OnInit {
   username: string = '';
   role: string = '';
+  email: string = '';
 
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
     this.authService.getUserDetails().subscribe(
-      user => {
-        this.username = user.firstname; // Adjust based on actual data
-        this.role = user.role; // Adjust based on actual data
+      (user: any) => {
+        console.log(user);
       },
-      error => {
-        console.error('Error fetching user details:', error);
+      (error: any) => {
+        console.error(error);
       }
     );
   }

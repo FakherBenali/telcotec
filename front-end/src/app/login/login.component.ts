@@ -1,52 +1,45 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports:   [FormsModule],
+  imports: [FormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-
   author = {
     email: '',
     password: '',
-  }
+  };
 
-  constructor(private _auth: AuthService , private router : Router) {  }
-  token :any;
-  loginError:boolean = false;
-  login(){
+  loginError: boolean = false;
 
-    this._auth.login(this.author).subscribe(
-      (res: any)=>{
-        console.log(res.status)
-        if (res.status == 400) {
-          this.loginError = true;
-        }else{
-          this.token = res ;
-          console.log(res);
-          
-          localStorage.setItem('token' , this.token.mytoken)
-          localStorage.setItem('permissions' , this.token.permissions)
-          localStorage.setItem('isadmin' , this.token.isadmin)
+  constructor(private authService: AuthService, private router: Router) {}
+
+  login() {
+    this.authService.login(this.author).subscribe({
+      next: (res: any) => {
+        if (res && res.mytoken) {
+          localStorage.setItem('token', res.mytoken);
+          localStorage.setItem('permissions', res.permissions);
+          localStorage.setItem('isadmin', res.isadmin.toString());
           this.router.navigate(['/home']);
+        } else {
+          this.loginError = true;
         }
-      }
-      ,
-      (err) =>{
+      },
+      error: (err) => {
         this.loginError = true;
-        console.log(err);
-        
+        console.error('Login error', err);
       }
-    )
+    });
   }
 
-  goToRegister( ){
+  goToRegister() {
     this.router.navigate(['/register']);
   }
 }

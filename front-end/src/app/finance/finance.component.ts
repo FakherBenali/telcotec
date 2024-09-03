@@ -52,7 +52,8 @@ export class FinanceComponent implements OnInit {
   };
 
   displayedColumns: string[] = ['projectName', 'userName', 'amount', 'status', 'action'];
-
+  displayedColumns1: string[] = ['projectName', 'amount', 'date'];
+  
   constructor(
     private financeService: FinanceService,
     private userService: UserService,
@@ -177,8 +178,11 @@ export class FinanceComponent implements OnInit {
   
 
   get allInvoices() {
-    return [...this.unpaidInvoices, ...this.paidInvoices];
+    return [...this.unpaidInvoices, ...this.paidInvoices].sort((a, b) => {
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
   }
+    
 
   private calculateSummary() {
     this.summary.totalAmount = this.allInvoices.reduce((acc, invoice) => acc + invoice.amount, 0);

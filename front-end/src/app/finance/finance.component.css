@@ -75,3 +75,30 @@ tr:nth-child(even) {
   align-items: center;
   font-size: 24px;
 }
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.calendar-day {
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  padding: 10px;
+  text-align: center;
+}
+
+.invoice-name {
+  font-weight: bold;
+}
+
+.invoice-budget {
+  color: green;
+}
+
+.invoice-date {
+  font-size: 0.9em;
+  color: gray;
+}

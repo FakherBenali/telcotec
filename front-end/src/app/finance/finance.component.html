@@ -116,19 +116,24 @@
           </mat-card-content>
         </mat-card>
       </mat-tab>
-
       <mat-tab label="History">
         <mat-card>
-          <mat-card-title>Invoice History</mat-card-title>
+          <mat-card-title>Invoice Calendar</mat-card-title>
           <mat-card-content>
-            <mat-list>
-              <mat-list-item *ngFor="let invoice of allInvoices">
-                {{ invoice.projectName }} - {{ invoice.userName }} - {{ invoice.amount | currency }} - Date {{ invoice.date }}
-              </mat-list-item>
-            </mat-list>
+            <div class="calendar-grid">
+              <div class="calendar-day" *ngFor="let invoice of allInvoices">
+                <div class="day-content">
+                  <div class="invoice-name">{{ invoice.projectName || 'No Project' }}</div>
+                  <div class="invoice-budget">{{ invoice.amount | currency }}</div>
+                  <div class="invoice-date">{{ invoice.date | date:'shortDate' }}</div>
+                </div>
+              </div>
+            </div>
           </mat-card-content>
         </mat-card>
       </mat-tab>
+            
+      
     </mat-tab-group>
 
     <div class="row">

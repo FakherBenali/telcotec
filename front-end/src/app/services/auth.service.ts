@@ -1,60 +1,43 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
-  private url = 'http://127.0.0.1:3000/author/';
-
-  constructor(private http: HttpClient) { }
-
-  register( author: any ){
-
-    return this.http.post(this.url + 'register' , author );
-
-  }
-
-  login( author: any ){
-
-    return this.http.post(this.url + 'login' , author );
-    
-  }
-
-
-  isLoggedIn(){
-    let token = localStorage.getItem('token');
-    if(token){
-      return true ;
-    }else{
-      return false ;
-    }
-
-  }
-
-  getAuthorDataFromToken(){
-    let token = localStorage.getItem('token');
-    
-    if(token){
-      let data = JSON.parse(atob(token.split('.')[1]));
-      return data ;
-    } 
-    
-  }
-
-
-  getById(id: any){
-    return this.http.get(this.url + 'getById/' + id);
-  }
-
   getUserDetails(): Observable<any> {
     const token = localStorage.getItem('token');
     if (token) {
-      const userId = JSON.parse(atob(token.split('.')[1])).id; // Extract user ID from token
+      const userId = JSON.parse(atob(token.split('.')[1])).id;
       return this.http.get<any>(`${this.url}getById/${userId}`);
     }
     throw new Error('No token found');
+  }  private url = 'http://127.0.0.1:3000/author/';
+
+  constructor(private http: HttpClient) {}
+
+  login(author: any): Observable<any> {
+    return this.http.post(this.url + 'login', author);
+  }
+  
+  register(email: string, password: string): Observable<any> {
+    return this.http.post(this.url + 'register', { email, password });
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  getAuthorDataFromToken() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      return JSON.parse(atob(token.split('.')[1]));
+    }
+    return null;
+  }
+
+  getById(id: string): Observable<any> {
+    return this.http.get(`${this.url}getById/${id}`);
   }
 }
